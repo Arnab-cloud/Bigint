@@ -1,7 +1,7 @@
 #include <iostream>
 #include <string>
 
-class bigInt
+class Bigint
 {
 	private:
 
@@ -140,7 +140,7 @@ class bigInt
 
 
 	public:
-	explicit bigInt(const std::string& num)
+	explicit Bigint(const std::string& num)
 	{
 		if(num[0] == '-')
 		{
@@ -170,10 +170,10 @@ class bigInt
 	{
 		if(m_sign)
 			std::cout<<'-';
-		std::cout<<m_number<<'\n';
+		std::cout<<m_number<< std::endl;
 	}
 	
-	int compare(const bigInt& b)
+	int compare(const Bigint& b)
 	{
 		if(m_sign != b.m_sign)
 			return m_sign ? -1 : 1;
@@ -183,9 +183,9 @@ class bigInt
 	}
 
 
-	bigInt add(const bigInt &num2) const
+	Bigint add(const Bigint &num2) const
 	{
-		bigInt result("");
+		Bigint result("");
 		if(m_sign == num2.m_sign)
 		{
 			result.setValue(addStrings(m_number, num2.m_number));
@@ -210,9 +210,9 @@ class bigInt
 		return result;
 	}
 
-	bigInt sub(const bigInt &num2) const
+	Bigint sub(const Bigint &num2) const
 	{
-		bigInt result("");
+		Bigint result("");
 
 		if(m_sign != num2.m_sign)
 		{
@@ -299,7 +299,64 @@ class bigInt
 		}
 	}
 
+	static void addStrings2(std::string& s1, const std::string& s2)
+	{
+		std::string result{};
+		std::size_t size1 = s1.size();
+		std::size_t size2 = s2.size();
+		int carry= 0;
+		int i1 = size1-1, i2 = size2-1;
+		while(i1>=0 || i2 >= 0 || carry)
+		{
+			char c1 = i1>=0 ? s1[i1--] : '0';
+			char c2 = i2>=0 ? s2[i2--] : '0';
+			result += calSumCy(c1, c2, carry);
+		}
 
+		reverse(result);
+		s1 = result;
+	}
+
+	static char mulChar(const char& c1, const char& c2, int& carry)
+	{
+		char ch = (c1-'0')*(c2-'0') + carry;
+		carry = ch/10;
+		ch %= 10;
+		ch += '0';
+		return ch;
+	}
+
+	std::string mulStrings(const std::string& s1, const std::string& s2) const
+	{
+		std::string result="0";
+		std::size_t size1 = s1.size();
+		std::size_t size2 = s2.size();
+		int count=0;
+		for(int j = size2-1; j>=0; j--)
+		{
+			int carry = 0;
+			std::string temp;
+			for(int i=size1-1; i>=0; i--)
+				temp += mulChar(s1[i], s2[j], carry);
+			if(carry)
+				temp += carry + '0';
+			reverse(temp);
+			for(int k = 0; k<count; k++)
+				temp += '0';
+			count++;
+			addStrings2(result, temp);
+		}
+		return result;
+	}
+
+	Bigint mul(const Bigint& num) const
+	{
+		Bigint result(mulStrings(m_number, num.m_number));
+		result.m_sign = m_sign != num.m_sign;
+		return result;
+	}
+
+	std::size_t size() const {return m_size;};
 
 };
 
@@ -310,9 +367,12 @@ int main(int argc, char *argv[])
 		std::cout << "Use: " << argv[0] << " <num1> <num2> <op>\n";
 		return 1;
 	}
-
-	bigInt a(argv[1]);
-	bigInt b(argv[2]);
+	int n;
+	n = std::atoi(argv[2]);
+	std::cout<<"value of n "<< n<< std::endl;
+	Bigint c("1");
+	Bigint a(argv[1]);
+	Bigint b(argv[2]);
 	char ch = *argv[3];
 	switch(ch)
 	{
@@ -340,6 +400,19 @@ int main(int argc, char *argv[])
 		a.print();
 		a.setValue(argv[2]);
 		a.print();
+		break;
+
+		case '.':
+		a.mul(b).print();
+		break;
+
+		case 'm':
+		//b = a;
+		//c.print();
+		for(int i=0; i<n; i++)
+			c = c.mul(a);
+		c.print();
+		std::cout << "number of digits: " << c.size() << std::endl;
 		break;
 		default:
 			std::cout << "Error: Use right operator\n";

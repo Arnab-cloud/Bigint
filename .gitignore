@@ -4,3 +4,5 @@ bigInt
 *.o
 *.exe
 *.swp
+.vscode
+toDoList.txt
