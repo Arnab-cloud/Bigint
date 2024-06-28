@@ -1,6 +1,11 @@
+// Standered libraries
 #include <iostream>
-#include <string>
 #include <algorithm>
+// STL
+#include <vector>
+#include <string>
+// 3rd party libararies
+#include "fft.h"
 
 class Bigint{
     private:
@@ -20,6 +25,7 @@ class Bigint{
     static std::string addStrings(const std::string& s1, const std::string& s2); // Adds two strings digit by digit
     static std::string subStrings(const std::string& s1, const std::string& s2); // Subtracts two strings digit by digit
     static std::string mulStrings(const std::string& s1, const std::string& s2); // Multiplies two strings digit by digit
+    static std::string mulStringsFFT(const std::string&, const std::string&); // Multiplies strings using Sconhage-Strassen algo 
     static void addStringsToFirst(std::string& s1, const std::string& s2);// Adds two strings and the result is stored in first string
 
     public:
@@ -42,8 +48,9 @@ class Bigint{
     // Multiplication
     Bigint operator*(const Bigint&) const;
     Bigint operator*(const std::string&) const;
+    Bigint mulFFT(const Bigint&) const;
+    Bigint mulFFT(const std::string&) const;
 
-    // Division
 
     // Add and copy
     Bigint& operator+=(const Bigint&);
@@ -221,11 +228,39 @@ std::string Bigint::mulStrings(const std::string& s1, const std::string& s2)
             temp += carry + '0';
 
         reverse(temp);
-        temp.append(size2-j,'0');
+        temp.append(size2-j-1,'0');
         addStringsToFirst(result, temp);
     }
     return result;
 }
+
+// Implimenting the COOEY-TUCKY algorithm for multiplication of large intergers
+std::string Bigint::mulStringsFFT(const std::string& num1, const std::string& num2)
+{
+    std::size_t num1Len = num1.size();
+    std::size_t num2Len = num2.size();
+   std::vector<int> a(num1Len);
+   std::vector<int> b(num2Len);
+
+    // copy all the character of first number into a BACKWORDS;
+   for(std::size_t i=0; i<num1Len; i++)
+        a[i] = num1[num1Len-1-i] - '0';
+    //  do the same thing for b
+    for(std::size_t i=0; i<num2Len; i++)
+        b[i] = num2[num2Len-1 -i] - '0';
+
+    // multiply using strassen fft algo
+    std::vector<int> resArr = std::move(mulstrassen(a,b));
+    std::size_t resLen = resArr.size();
+    std::string result;
+    for(int i = resLen-1; i>=0; i--)
+    {
+        result += "0";
+        addStringsToFirst(result,std::to_string(resArr[i]));
+    }
+    return result;
+}
+
 
 void Bigint::addStringsToFirst(std::string& s1, const std::string& s2) {s1 = addStrings(s1,s2);}
 
@@ -312,6 +347,23 @@ Bigint Bigint::operator*(const Bigint& num) const
 
 Bigint Bigint::operator*(const std::string& num) const {return *this * Bigint(num);}
 
+// using fft
+Bigint Bigint::mulFFT(const Bigint& num) const
+{
+    Bigint result(mulStringsFFT(m_number, num.m_number));
+    result.m_sign = m_sign != num.m_sign;
+    return result;
+}
+
+Bigint Bigint::mulFFT(const std::string& str) const
+{
+    Bigint num(str);   
+    Bigint result(mulStringsFFT(m_number, num.m_number));
+    result.m_sign = m_sign != num.m_sign;
+    return result;
+}
+
+
 
 // Divisions (To Be added)
 
@@ -396,6 +448,7 @@ int main(int argc, char *argv[])
 	}
 
     Bigint ip;
+    Bigint c;
     int n = atoi(argv[2]);
 	Bigint a(argv[1]);
 	Bigint b(argv[2]);
@@ -433,10 +486,14 @@ int main(int argc, char *argv[])
 		break;
 
 		case '.':
-		(a*b).print();
+		std::cout << (a*b).size()<<'\n';
 		break;
 
-		case 'm':
+        case 'f':
+            std::cout << a.mulFFT(b).size()<<'\n';
+            break;
+		// to calculate power
+        case 'm':
         std::cout<<n<<'\n';
         a = a^n;
 		// a.print();
@@ -450,6 +507,7 @@ int main(int argc, char *argv[])
         break;
 
 		case 'p':
+        // also to calculate power
 			std::cout << (a^atoi(argv[2])) << std::endl; 
 			break;
 		default:

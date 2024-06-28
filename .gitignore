@@ -1,4 +1,5 @@
 exp.cpp
+fft.cpp
 Bigint
 *.out
 *.o
