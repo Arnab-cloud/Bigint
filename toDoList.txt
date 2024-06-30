@@ -1,4 +1,0 @@
-1. Add operator overloading
-2. Impliment a faster algorithm for additon and multiplaication
-3. Try to impliment threads
-4. Try to get rid of the std::string class and use normal char array

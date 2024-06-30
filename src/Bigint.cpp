@@ -1,9 +1,24 @@
+/**
+ * This file contains function definitions for Bigint class
+ * Big numbers are represented as strings
+ * Arithmatic opeations are done on those strings
+ * 
+ * Most of the cases that is done character by character
+ * Execept for "mulStringsFFT" that uses fft algorithm to find the result
+ * 
+ * The default consturtor first checks if the string is valid
+ * If not the the Bigint number is initialized with "0"
+ * 
+ */
+
 // Standered libraries
 #include <iostream>
 #include <algorithm>
+
 // STL
 #include <vector>
 #include <string>
+
 // 3rd party libararies
 #include "Bigint.h"
 #include "Fft.h"
@@ -12,6 +27,7 @@
 // Funcion Definitons
 Bigint::Bigint(const std::string& num):m_number{"0"}, m_sign{false}, m_size{1}  // Default constructor
 {
+    // Validation
     if(num.size()==0 || num == "-" || !std::all_of(num.begin() + (num[0] == '-'|| num[0] == '+' ? 1 : 0), num.end(), ::isdigit))
         return;
     else
@@ -31,20 +47,36 @@ Bigint::Bigint(const std::string& num):m_number{"0"}, m_sign{false}, m_size{1}  
         m_size = m_number.size();
     }
 };
+
 // Private
 
+void Bigint::reverse(std::string &s) {std::reverse(s.begin(), s.end());} // Reverses the input string
 
-void Bigint::reverse(std::string &s) {std::reverse(s.begin(), s.end());}
-
-int Bigint::compWithoutSign(const std::string& s1,const std::string& s2)
-{
-    std::size_t size1 = s1.size();
+int Bigint::compWithoutSign(const std::string& s1,const std::string& s2) // Numerically compares the two input strings (first w.r.t. second)
+{                                                                        // if Greater returns 1
+    std::size_t size1 = s1.size();                                       // if Less returns -1, else 0
     std::size_t size2 = s2.size();
     int comp = (size1 != size2) ? size1 - size2 : s1.compare(s2);
     return comp == 0 ? 0 : (comp > 0 ? 1 : -1);
 }
 
-char Bigint::calSumCy(char c1, char c2, int &carry)
+/**
+ * @param:
+ * c1: char type
+ *  In valid case "0" to "9"
+ * 
+ * c2: char type
+ *  In valid case "0" to "9"
+ * 
+ * carry: int type
+ *  values = 0 or 1
+ * 
+ * @return:
+ *  char type
+ *  valaue = c1 + c2 after numerical addition
+ *  if carry is generated carry is set, otherwise reset
+ */
+char Bigint::calSumCy(char c1, char c2, int &carry) 
 {
     int sum = (c1 - '0') +(c2 - '0') + carry;
     carry = sum/10;
