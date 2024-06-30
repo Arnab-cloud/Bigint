@@ -1,9 +1,6 @@
-exp.cpp
-fft.cpp
-Bigint
 *.out
 *.o
-*.exe
 *.swp
 .vscode
-toDoList.txt
+random/
+obj/
