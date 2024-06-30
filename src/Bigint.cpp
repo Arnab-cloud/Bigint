@@ -184,7 +184,7 @@ std::string Bigint::mulStrings(const std::string& s1, const std::string& s2)
     return result;
 }
 
-// Implimenting the COOEY-TUCKY algorithm for multiplication of large intergers
+// Implementing the COOEY-TUCKY algorithm for multiplication of large intergers
 std::string Bigint::mulStringsFFT(const std::string& num1, const std::string& num2)
 {
     std::size_t num1Len = num1.size();

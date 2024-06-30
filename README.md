@@ -1,7 +1,7 @@
 # Bigint Class
 
 ## Overview
-The **Bigint** class implements **arbitrary-precision arithmetic** for **integers**. It supports **addition, subtraction, multiplication (both traditional and using FFT), comparison operations, and more**. There is **no bound to the size** of the number.
+The **Bigint** class Implements **arbitrary-precision arithmetic** for **integers**. It supports **addition, subtraction, multiplication (both traditional and using FFT), comparison operations, and more**. There is **no bound to the size** of the number.
 
 ## Dependencies
 - Standard C++ libraries
